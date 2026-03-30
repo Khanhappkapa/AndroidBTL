@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Fullscreen game theme – no ActionBar, no title bar -->
+    <style name="Theme.Slime" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#3A1EC8</item>
+        <item name="colorPrimaryVariant">#1A0A8F</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#74E4FF</item>
+        <item name="colorSecondaryVariant">#00AACC</item>
+        <item name="colorOnSecondary">#000000</item>
+        <!-- Make status bar transparent (fullscreen set programmatically) -->
+        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:windowBackground">#0A0A2E</item>
+    </style>
+</resources>
