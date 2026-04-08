@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#CC0A0A2E"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/gameOverBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/cloudsday"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="32dp">
@@ -56,23 +66,28 @@
         android:padding="8dp"
         android:layout_marginBottom="24dp"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnPlayAgain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="220dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:paddingBottom="8dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/slime_button"
+        android:background="@drawable/btn_blue"
         android:text="Play Again"
         android:textColor="@color/slime_text"
         android:textSize="18sp"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/slime_blue_light"
+        android:layout_width="220dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:paddingBottom="8dp"
+        android:background="@drawable/btn_darkblue"
         android:text="Main Menu"
         android:textColor="@color/slime_text"
         android:textSize="18sp"/>
 
 </LinearLayout>
+</FrameLayout>

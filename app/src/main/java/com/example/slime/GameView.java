@@ -9,6 +9,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import androidx.core.content.res.ResourcesCompat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -16,7 +17,10 @@ import android.hardware.SensorManager;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
+import com.example.slime.entities.BackgroundTheme;
 import com.example.slime.entities.SlimeState;
 import com.example.slime.platform.BouncyPlatform;
 import com.example.slime.platform.DisappearingPlatform;
@@ -56,16 +60,13 @@ public class GameView extends SurfaceView
     private SensorManager sensorManager;
     private float scaleX = 1f, scaleY = 1f;
 
+    private BackgroundTheme currentTheme;
+    private Bitmap bgImg;
+
     private SpriteSheet spriteSheet;
     public static Bitmap platformsBmp;
     public static Bitmap afterbreakBmp;
-    private Paint bgPaint;
     private Paint scorePaint;
-    private Paint starPaint;
-
-    private final float[] starX = new float[60];
-    private final float[] starY = new float[60];
-    private final float[] starR = new float[60];
 
     private GameThread gameThread;
     
@@ -78,34 +79,27 @@ public class GameView extends SurfaceView
         this.gameOverListener = listener;
     }
 
-    public GameView(Context context) {
+    public GameView(Context context, BackgroundTheme theme) {
         super(context);
+        this.currentTheme = theme;
         getHolder().addCallback(this);
         setFocusable(true);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         initPaints();
-        initStars();
     }
 
     private void initPaints() {
-        bgPaint = new Paint();
 
         scorePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         scorePaint.setColor(Color.WHITE);
-        scorePaint.setTextSize(26f);
-        scorePaint.setTypeface(Typeface.DEFAULT_BOLD);
-        scorePaint.setShadowLayer(4f, 2f, 2f, Color.parseColor("#44000000"));
-
-        starPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        starPaint.setColor(Color.WHITE);
-    }
-
-    private void initStars() {
-        for (int i = 0; i < starX.length; i++) {
-            starX[i] = rng.nextFloat() * GW;
-            starY[i] = rng.nextFloat() * GH;
-            starR[i] = 0.5f + rng.nextFloat() * 1.5f;
+        scorePaint.setTextSize(32f); 
+        try {
+            Typeface pixelFont = ResourcesCompat.getFont(getContext(), R.font.dogicapixel);
+            scorePaint.setTypeface(pixelFont);
+        } catch (Exception e) {
+            scorePaint.setTypeface(Typeface.DEFAULT_BOLD);
         }
+        scorePaint.setShadowLayer(4f, 2f, 2f, Color.parseColor("#44000000"));
     }
 
     @Override
@@ -118,6 +112,9 @@ public class GameView extends SurfaceView
         
         platformsBmp = BitmapFactory.decodeResource(getResources(), R.drawable.platforms, opts);
         afterbreakBmp = BitmapFactory.decodeResource(getResources(), R.drawable.afterbreak, opts);
+        
+        int bgResId = (currentTheme == BackgroundTheme.DAY) ? R.drawable.cloudsday : R.drawable.cloudsnight;
+        bgImg = BitmapFactory.decodeResource(getResources(), bgResId, opts);
 
         startGame();
 
@@ -131,14 +128,33 @@ public class GameView extends SurfaceView
         gameThread.start();
     }
 
+    private Rect srcBgRect = new Rect();
+    private RectF dstBgRect = new RectF();
+
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         scaleX = w / GW;
         scaleY = h / GH;
-        bgPaint.setShader(new LinearGradient(0, 0, 0, h,
-                new int[]{Color.parseColor("#0A0A2E"), Color.parseColor("#1A1A5E"),
-                          Color.parseColor("#2B1B6F")},
-                null, Shader.TileMode.CLAMP));
+
+        if (bgImg != null) {
+            float imgRatio = (float) bgImg.getWidth() / bgImg.getHeight();
+            float screenRatio = (float) w / h;
+
+            int srcX = 0, srcY = 0, srcW = bgImg.getWidth(), srcH = bgImg.getHeight();
+
+            if (screenRatio > imgRatio) {
+                // Screen is wider proportionally. Crop height.
+                srcH = (int) (srcW / screenRatio);
+                srcY = (bgImg.getHeight() - srcH) / 2;
+            } else {
+                // Screen is taller proportionally. Crop width.
+                srcW = (int) (srcH * screenRatio);
+                srcX = (bgImg.getWidth() - srcW) / 2;
+            }
+
+            srcBgRect.set(srcX, srcY, srcX + srcW, srcY + srcH);
+            dstBgRect.set(0, 0, w, h);
+        }
     }
 
     @Override
@@ -225,8 +241,8 @@ public class GameView extends SurfaceView
     }
 
     private boolean slimeLandsOn(Platform p) {
-        float sl = slime.x + 4f;              
-        float sr = slime.x + Slime.SIZE - 4f;
+        float sl = slime.x + 10f;              
+        float sr = slime.x + Slime.SIZE - 10f;
         float sb = slime.y + Slime.SIZE;      
         float pt = p.getY();                  
         float pl = p.getX();
@@ -280,12 +296,8 @@ public class GameView extends SurfaceView
     void render(Canvas canvas) {
         if (canvas == null) return;
 
-        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), bgPaint);
-
-        for (int i = 0; i < starX.length; i++) {
-            float alpha = 0.4f + 0.6f * ((float) Math.sin(System.currentTimeMillis() * 0.001f + i) * 0.5f + 0.5f);
-            starPaint.setAlpha((int)(alpha * 200));
-            canvas.drawCircle(starX[i] * scaleX, starY[i] * scaleY, starR[i] * scaleX, starPaint);
+        if (bgImg != null) {
+            canvas.drawBitmap(bgImg, srcBgRect, dstBgRect, null);
         }
 
         canvas.save();

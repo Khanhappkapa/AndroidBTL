@@ -6,6 +6,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import android.content.Intent;
+import com.example.slime.entities.BackgroundTheme;
 
 public class GameActivity extends Activity implements GameView.GameOverListener {
 
@@ -22,7 +23,17 @@ public class GameActivity extends Activity implements GameView.GameOverListener 
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        gameView = new GameView(this);
+        String themeStr = getIntent().getStringExtra("BG_THEME");
+        BackgroundTheme theme = BackgroundTheme.DAY;
+        if (themeStr != null) {
+            try {
+                theme = BackgroundTheme.valueOf(themeStr);
+            } catch (Exception e) {
+                // fallback to DAY
+            }
+        }
+
+        gameView = new GameView(this, theme);
         gameView.setGameOverListener(this);
         setContentView(gameView);
     }
@@ -40,12 +51,10 @@ public class GameActivity extends Activity implements GameView.GameOverListener 
     @Override
     protected void onPause() {
         super.onPause();
-        // GameView unregisters sensor in surfaceDestroyed
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // GameView re-registers sensor when surface is recreated
     }
 }

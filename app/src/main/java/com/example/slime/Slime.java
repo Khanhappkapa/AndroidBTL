@@ -36,7 +36,7 @@ import com.example.slime.entities.SlimeState;
 public class Slime {
 
     // ── Logical size ─────────────────────────────────────────────────────────
-    public static final float SIZE = 44f; // logical game units
+    public static final float SIZE = 43f; // logical game units
 
     // ─── Frame index arrays ───────────────────────────────────────────────────
     //
@@ -172,13 +172,20 @@ public class Slime {
 
     // ── Drawing ───────────────────────────────────────────────────────────────
     public void draw(Canvas canvas) {
-        Bitmap bmp = currentBitmap();
+        int frameId = currentFrameId();
+        Bitmap bmp = sheet.getFrame(frameId);
         if (bmp == null) return;
 
-        RectF dst = new RectF(x, y, x + SIZE, y + SIZE);
+        int baseLine = getBaseline(frameId);
+        float scale = SIZE / 32f;
+        float scaledBase = baseLine * scale;
+        float offsetY = SIZE - scaledBase;
+
+        RectF dst = new RectF(x, y + offsetY, x + SIZE, y + SIZE + offsetY);
+        
         if (facingLeft) {
             canvas.save();
-            canvas.scale(-1f, 1f, x + SIZE / 2f, y + SIZE / 2f);
+            canvas.scale(-1f, 1f, x + SIZE / 2f, y + SIZE / 2f + offsetY);
             canvas.drawBitmap(bmp, null, dst, paint);
             canvas.restore();
         } else {
@@ -186,24 +193,29 @@ public class Slime {
         }
     }
 
-    // ── Internal ──────────────────────────────────────────────────────────────
-    private Bitmap currentBitmap() {
+    private int currentFrameId() {
         switch (state) {
-            case LANDING: {
-                int idx = Math.min(frameIdx, F_LANDING.length - 1);
-                return sheet.getFrame(F_LANDING[idx]);
-            }
-            case LAUNCH: {
-                int idx = Math.min(frameIdx, F_LAUNCH.length - 1);
-                return sheet.getFrame(F_LAUNCH[idx]);
-            }
-            case FALLING: {
-                int idx = Math.min(frameIdx, F_FALLING.length - 1);
-                return sheet.getFrame(F_FALLING[idx]);
-            }
+            case LANDING: return F_LANDING[Math.min(frameIdx, F_LANDING.length - 1)];
+            case LAUNCH:  return F_LAUNCH[Math.min(frameIdx, F_LAUNCH.length - 1)];
+            case FALLING: return F_FALLING[Math.min(frameIdx, F_FALLING.length - 1)];
             case IDLE:
-            default:
-                return sheet.getFrame(F_STATIC);
+            default:      return F_STATIC;
         }
     }
+
+    private int getBaseline(int frameId) {
+        switch (frameId) {
+            case 6: return 16;
+            case 9: return 14;
+            case 1: return 29;
+            case 2: return 28;
+            case 3: return 26;
+            case 11: return 19;
+            case 13: return 26;
+            case 0: default: return 29;
+        }
+    }
+
+    // ── Internal ──────────────────────────────────────────────────────────────
+
 }

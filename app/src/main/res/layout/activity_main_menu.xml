@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/slime_blue_dark"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/mainMenuBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/cloudsday"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="32dp">
@@ -29,33 +39,40 @@
         android:layout_marginBottom="32dp"
         android:visibility="gone"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnStart"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="220dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:paddingBottom="8dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/slime_button"
+        android:background="@drawable/btn_blue"
         android:text="@string/start_game"
         android:textColor="@color/slime_text"
         android:textSize="18sp"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnLeaderboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="220dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:paddingBottom="8dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/slime_button"
+        android:background="@drawable/btn_yellow"
         android:text="@string/leaderboard"
         android:textColor="@color/slime_text"
         android:textSize="18sp"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSignIn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/slime_blue_light"
+        android:layout_width="220dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:paddingBottom="8dp"
+        android:background="@drawable/btn_darkblue"
         android:text="@string/sign_in"
         android:textColor="@color/slime_text"
         android:textSize="16sp"/>
 
 </LinearLayout>
+</FrameLayout>
